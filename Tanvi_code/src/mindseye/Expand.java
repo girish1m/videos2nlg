@@ -18,7 +18,7 @@ public class Expand {
     static HashSet<String> object_list = new HashSet<String>();
     static HashSet<String> verb_list = new HashSet<String>();
     
-    
+    //This function reads a list of verbs from a file (inputFile)
     public static void readVerbList(String inputFile){
         
         try{
@@ -41,6 +41,8 @@ public class Expand {
         
     }
     
+    //This function reads two object files and adds all entries to an object list
+    //It writes them to an output file
     public static void readObjectList2(String objectFile1, String objectFile2, String writeFile){
         
         try{
@@ -79,7 +81,7 @@ public class Expand {
         
     }
     
-    
+    //This function reads a list of objects from a file
     public static void readObjectList(String objectFile){
         
         try{
@@ -99,7 +101,8 @@ public class Expand {
         
     }
     
-    public static void writeExpanded(HashSet list, String writeFile,WordNetDatabase database, SynsetType senseType){
+    // This function expands the verb and subject/object list using synonyms of wordnet
+    public static void writeExpanded(HashSet list, String writeFile, WordNetDatabase database, SynsetType senseType){
         
         try{
                   File output_file = new File(writeFile);
@@ -127,35 +130,33 @@ public class Expand {
 
     
     }
-    /*
-     * this expands the verb and subject/object list using synonyms of wordnet
-     */
+   
     
     public static void main(String args[]){
         
         //Loading word net database
-        System.setProperty("wordnet.database.dir", "/Users/girish/Dropbox/Tanvi_code/submit/dependencies/WordNet/2.1/dict");
+        System.setProperty("wordnet.database.dir", "/home/niveda/Documents/RA_work/Tanvi_code/submit/dependencies/WordNet/2.1/dict");
         WordNetDatabase database = WordNetDatabase.getFileInstance();
         
         
         
         //loaded object list
-        String objectList = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/total_object_list.txt";
+        String objectList = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/total_object_list.txt";
         readObjectList(objectList);
         System.out.println("made object list" + object_list.size());
               
         //expanding object list
-        String expandedObjectList = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/expanded_object_list.txt";
+        String expandedObjectList = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/expanded_object_list.txt";
         writeExpanded(object_list, expandedObjectList, database, SynsetType.NOUN);
         
         
         //loaded verb list
-        String verbFile = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/verb_list.txt";
+        String verbFile = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/verb_list.txt";
         readVerbList(verbFile);
         System.out.println("made verb list"+ verb_list.size());
         
         //expanding verb list
-        String expandedVerbList = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/expanded_verb_list.txt";
+        String expandedVerbList = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/expanded_verb_list.txt";
         writeExpanded(verb_list, expandedVerbList, database, SynsetType.VERB);
         
         

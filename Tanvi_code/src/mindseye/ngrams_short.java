@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
  *
  * @author tanvi
  */
+
+//This program takes all n-gram files and extracts the subset that contains a specified list of verbs or objects
 public class ngrams_short {
     
     
@@ -233,11 +235,11 @@ public class ngrams_short {
          * 
          */
         
-        String verbFile = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/all_forms_verb.txt";
+        String verbFile = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/all_forms_verb.txt";
         readVerbList(verbFile);
         System.out.println("made verb list"+ verb_list);
         
-        String objectList = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/expanded_object_list.txt";
+        String objectList = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/expanded_object_list.txt";
         readExpandedObjectList(objectList);
         System.out.println("made object list" + object_list + " size " + object_list.size());
         

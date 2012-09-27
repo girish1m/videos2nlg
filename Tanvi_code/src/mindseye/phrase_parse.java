@@ -30,7 +30,7 @@ class PCFGphrase{
 
 public class phrase_parse {
   
-    static String parserPath = "/Users/girish/Dropbox/Tanvi_code/submit/dependencies/englishPCFG.ser.gz";
+    static String parserPath = "/home/niveda/Documents/RA_work/Tanvi_code/submit/dependencies/englishPCFG.ser.gz";
     static ArrayList<PCFGphrase> pcfg_phrases = new ArrayList<PCFGphrase>();
     
     static ArrayList<String> subject_words = new ArrayList<String>();
@@ -200,11 +200,11 @@ public class phrase_parse {
          String object = "ball";
          
          // read object list
-         match.readObjectList("/Users/girish/Dropbox/Tanvi_code/submit/data_files/expanded_object_list.txt");
+         match.readObjectList("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/expanded_object_list.txt");
          System.out.println(" expanded object list " + match.expanded_object_list);
          
          //read verb list
-         match.readVerbList("/Users/girish/Dropbox/Tanvi_code/submit/data_files/all_forms_verb.txt");
+         match.readVerbList("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/all_forms_verb.txt");
          System.out.println(" expanded verb list " + match.expanded_verb_list);
          
          subject_words = match.expanded_object_list.get(subject);
@@ -213,18 +213,18 @@ public class phrase_parse {
          
 
         //output of Match class
-        String inFile = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/person_pass_ball/sort_final_phrases.txt";
+        String inFile = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/sort_final_phrases.txt";
         // output of this class (no sort)
-        String outFile = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/person_pass_ball/PCFG_final_phrases.txt";
+        String outFile = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/PCFG_final_phrases.txt";
         // does parsing and puts output in output file
         readPhrases(inFile,outFile);
         
         // sorts by pcfg scores
-        String sortoutFile_pcfg = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/person_pass_ball/sort_pcfg_score_PCFG_final_phrases.txt";
+        String sortoutFile_pcfg = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/sort_pcfg_score_PCFG_final_phrases.txt";
         sort_phrases_acc_pcfg_score(sortoutFile_pcfg);
         
         // sorts by freq counts
-        String sortoutFile_freq = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/person_pass_ball/sort_freq_PCFG_final_phrases.txt";
+        String sortoutFile_freq = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/sort_freq_PCFG_final_phrases.txt";
         sort_phrases_acc_freq(sortoutFile_freq);
         
             

@@ -165,7 +165,7 @@ public class Mindseye {
     
     public static void printParses (String outputFile){
         
-        LexicalizedParser lp = new LexicalizedParser("/Users/girish/Dropbox/Tanvi_code/submit/dependencies/englishPCFG.ser.gz");
+        LexicalizedParser lp = new LexicalizedParser("/home/niveda/Documents/RA_work/Tanvi_code/submit/dependencies/englishPCFG.ser.gz");
         lp.setOptionFlags(new String[]{"-maxLength", "80", "-retainTmpSubcategories"});
 
         Morphology m = new Morphology();
@@ -177,7 +177,7 @@ public class Mindseye {
             PrintWriter out = new PrintWriter(fstream);
         
         
-            File ffile2 = new File("/Users/girish/Dropbox/Tanvi_code/submit/data_files/temp_output_parsing.txt");
+            File ffile2 = new File("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/temp_output_parsing.txt");
             FileWriter fstream2 = new FileWriter(ffile2);
             PrintWriter out2 = new PrintWriter(fstream2);
                 // Accessing sentences
@@ -272,16 +272,16 @@ public class Mindseye {
         //readObjectList("C:/Users/tanvi/Desktop/mindseye/vaticlabels_C-D1_0819.tar/vaticlabels_C-D1_0819/vaticlabels_C-D1_0819/labels");
         //System.out.println("object hashset" + objectList);
         
-        String verbFile = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/verb_list.txt";
+        String verbFile = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/verb_list.txt";
         readVerbList2(verbFile);
         System.out.println("made verb list"+ verb_list2);
         System.out.println("check " + verb_list2.contains("walk"));
         
-        getVidMapping("/Users/girish/Dropbox/Tanvi_code/HR_ARL_D_DES_240HP_20110520_AMZ_1_1_HR-FOR-AMZ-DES-DEV_FILENAMES.CSV");
+        getVidMapping("/home/niveda/Documents/RA_work/Tanvi_code/HR_ARL_D_DES_240HP_20110520_AMZ_1_1_HR-FOR-AMZ-DES-DEV_FILENAMES.CSV");
         System.out.println("vid id mapping" + vid_id_mapping);
         
-        readNLSentences("/Users/girish/Dropbox/Tanvi_code/copy_HR_ARL_D_DES_240HP_20110520_AMZ_1_1_HR-FOR-AMZ-DES-DEV.CSV");
-        printParses("/Users/girish/Dropbox/Tanvi_code/submit/data_files/NLSentenceParses_new.txt");
+        readNLSentences("/home/niveda/Documents/RA_work/Tanvi_code/copy_HR_ARL_D_DES_240HP_20110520_AMZ_1_1_HR-FOR-AMZ-DES-DEV.CSV");
+        printParses("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/NLSentenceParses_new.txt");
          
         
     }

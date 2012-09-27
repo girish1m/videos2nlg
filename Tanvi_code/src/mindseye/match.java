@@ -14,7 +14,13 @@ import java.util.*;
 import java.io.*;
 import java.math.BigInteger;
 import java.util.regex.Pattern;
-
+import edu.berkeley.nlp.lm.ArrayEncodedNgramLanguageModel;
+import edu.berkeley.nlp.lm.StupidBackoffLm;
+import edu.berkeley.nlp.lm.cache.ArrayEncodedCachingLmWrapper;
+import edu.berkeley.nlp.lm.io.LmReaders;
+import edu.berkeley.nlp.lm.StringWordIndexer;
+import edu.berkeley.nlp.lm.util.LongRef;
+import edu.berkeley.nlp.lm.map.NgramMapWrapper;
 /**
  *
  * @author tanvi
@@ -47,6 +53,12 @@ class Phrase{
     int frequency;
 }
 
+class PhraseLM{
+	String line;
+	double score;
+}
+
+
 public class match {
     
     //object List
@@ -64,9 +76,11 @@ public class match {
     static HashMap<String, ArrayList<String>> verb_subject = new HashMap<String, ArrayList<String>>();
     
     static ArrayList<Phrase> all_phrases = new ArrayList<Phrase>();
+    static ArrayList<PhraseLM> all_phrases_lm = new ArrayList<PhraseLM>();
+    static StupidBackoffLm<String> sblm=null;
     
     
-     public static void readNGrams(String inputDir, ArrayList<Pair> pairs, String outFile){
+    /* public static void readNGrams(String inputDir, ArrayList<Pair> pairs, String outFile){
         
         try{
             File output_file = new File(outFile);
@@ -102,7 +116,7 @@ public class match {
         }catch(Exception e){System.out.println("exception" +e);}
         
     }
-     
+     */
      
      public static void processTriple(String subject, String verb, String object, String inputDir, String outDir){
          
@@ -146,14 +160,15 @@ public class match {
                     String[] words = splitter.split(line);
                     
                     String first = words[0];
+                    String second = words[1];
                     String last = words[words.length-2];
                     //System.out.println(" first " + first  + " last "+ last);
                     
-                    if (subject_words.contains(first) && verb_words.contains(last)){
+                    if ((subject_words.contains(first) || subject_words.contains(second)) && verb_words.contains(last)){
                         subject_verb.add(line);
                         out_subject_verb.write(line+"\n");
                     }
-                    if (object_words.contains(first) && verb_words.contains(last)){
+                    if ((object_words.contains(first) || object_words.contains(second)) && verb_words.contains(last)){
                         object_verb.add(line);
                         out_object_verb.write(line+"\n");
                     }
@@ -189,7 +204,7 @@ public class match {
          
      }
      
-     public static void mergeLists(String outFile){
+    /* public static void mergeLists(String outFile){
          
          try{
             File output_file = new File(outFile);
@@ -236,14 +251,7 @@ public class match {
 
              }
              
-             
-             
-             
-             
-             
-             
-             
-             
+                    
              // passive phrases
              Iterator it_object_verb = object_verb.iterator();
              while(it_object_verb.hasNext()){
@@ -284,23 +292,118 @@ public class match {
 
              }
              
-             
-             
-             
-             
-             
-             
-            
-            
-            
-            
+ 
             out.close();
         }catch(Exception e){System.out.println("exception" +e);}
-            
-            
+     
+     } */
+     
+ public static void mergeLists_LanguageModel(String outFile){
          
-         
+         try{
+            File output_file = new File(outFile);
+            FileWriter fstream = new FileWriter(output_file);
+            BufferedWriter out = new BufferedWriter(fstream); 
+            
+             // active phrases
+             Iterator it_subject_verb = subject_verb.iterator();
+             while(it_subject_verb.hasNext()){
+                 String current = (String)it_subject_verb.next(); //current is the S...V ngram
+                 System.out.println("subject verb line " + current);
+                 String pattern = "[\\s]+";
+                 Pattern splitter = Pattern.compile(pattern);
+                 String[] words = splitter.split(current); //words: 0-length-2 are S...V ngram words
+
+                 String verb = words[words.length-2];
+                 int frequency_subject_verb = Integer.parseInt(words[words.length-1]);
+
+                 ArrayList current_verb_objects = verb_object.get(verb);
+                 if (current_verb_objects == null) continue;
+
+                 current = current.substring(0, current.lastIndexOf(verb));
+                 Iterator it_verb_objects = current_verb_objects.iterator();
+                 while(it_verb_objects.hasNext()){
+                     String current_verb_object = (String)it_verb_objects.next();
+                     System.out.println("verb object line " + current_verb_object);
+                 
+                     String[] words_verb_object = splitter.split(current_verb_object); //words_verb_object: 0-length-2 are V...O words 
+                     String freq_str = words_verb_object[words_verb_object.length-1];
+                     String verb_object_phrase = current_verb_object.substring(0,current_verb_object.lastIndexOf(freq_str));
+                     int frequency_verb_object = Integer.parseInt(freq_str);
+              
+                     String newphrase = current + " "+ verb_object_phrase;
+                     
+                     double finalscore = 0; //Assign a score based on words and words_verb_object
+                     for(int i=0;i<words.length-4;i++)
+                    	 finalscore+=sblm.getLogProb(Arrays.asList(words[i], words[i+1], words[i+2]));
+                     finalscore+=sblm.getLogProb(Arrays.asList(words[words.length-3], words[words.length-2],words_verb_object[1]));
+                     for(int i=1;i<words_verb_object.length-4;i++)
+                    	 finalscore+=sblm.getLogProb(Arrays.asList(words_verb_object[i], words_verb_object[i+1], words_verb_object[i+2]));
+                     //int finalfreq = frequency_subject_verb * frequency_verb_object;
+                     
+                     PhraseLM final_phrase_obj = new PhraseLM();
+                     final_phrase_obj.score=finalscore;
+                     final_phrase_obj.line=newphrase;
+                     all_phrases_lm.add(final_phrase_obj);
+                     
+                     System.out.println("new phrase " + newphrase + " final freq "+ finalscore);
+                     out.write("Phrase:"+ newphrase+";Freq:"+finalscore+"\n");
+                 }
+
+             }
+             
+                    
+             // passive phrases
+             Iterator it_object_verb = object_verb.iterator();
+             while(it_object_verb.hasNext()){
+                 String current = (String)it_object_verb.next();
+                 System.out.println("object verb line " + current);
+                 String pattern = "[\\s]+";
+                 Pattern splitter = Pattern.compile(pattern);
+                 String[] words = splitter.split(current);
+
+                 String verb = words[words.length-2];
+                 int frequency_object_verb = Integer.parseInt(words[words.length-1]);
+
+                 ArrayList current_verb_subjects = verb_subject.get(verb);
+                 if (current_verb_subjects == null) continue;
+
+                 current = current.substring(0, current.lastIndexOf(verb));
+                 Iterator it_verb_subjects = current_verb_subjects.iterator();
+                 while(it_verb_subjects.hasNext()){
+                     String current_verb_subject = (String)it_verb_subjects.next();
+                     System.out.println("verb subject line " + current_verb_subject);
+                 
+                     String[] words_verb_subject = splitter.split(current_verb_subject);
+                     String freq_str = words_verb_subject[words_verb_subject.length-1];
+                     String verb_subject_phrase = current_verb_subject.substring(0,current_verb_subject.lastIndexOf(freq_str));
+                     int frequency_verb_subject = Integer.parseInt(freq_str);
+              
+                     String newphrase = current + " "+ verb_subject_phrase;
+                     //int finalfreq = frequency_object_verb * frequency_verb_subject;
+                     double finalscore = 0; //Assign a score based on words and words_verb_subject
+                     for(int i=0;i<words.length-4;i++)
+                    	 finalscore+=sblm.getLogProb(Arrays.asList(words[i], words[i+1], words[i+2]));
+                     finalscore+=sblm.getLogProb(Arrays.asList(words[words.length-3], words[words.length-2],words_verb_subject[1]));
+                     for(int i=1;i<words_verb_subject.length-4;i++)
+                    	 finalscore+=sblm.getLogProb(Arrays.asList(words_verb_subject[i], words_verb_subject[i+1], words_verb_subject[i+2]));
+                     
+                     PhraseLM final_phrase_obj = new PhraseLM();
+                     final_phrase_obj.score=finalscore;
+                     final_phrase_obj.line=newphrase;
+                     all_phrases_lm.add(final_phrase_obj);
+                     
+                     System.out.println("new phrase " + newphrase + " final freq "+ finalscore);
+                     out.write("Phrase:"+ newphrase+";Freq:"+finalscore+"\n");
+                 }
+
+             }
+  
+            out.close();
+        }catch(Exception e){System.out.println("exception" +e);}
+    
      }
+
      
      public static void readObjectList(String objectFile){
         
@@ -371,9 +474,38 @@ public class match {
         }catch(Exception e){System.out.println("exception" +e);}
         
     }
+ public static void sort_phrases_LanguageModel(String outFile){
+         
+         try{
+            File output_file = new File(outFile);
+            FileWriter fstream = new FileWriter(output_file);
+            BufferedWriter out = new BufferedWriter(fstream);
+         
+             // sorting
+             Object[] p = all_phrases_lm.toArray();
+             Arrays.sort(p, new Comparator() {
+
+                @Override
+                public int compare(Object o1, Object o2) {
+                    PhraseLM p1 = (PhraseLM)o1;
+                    PhraseLM p2 = (PhraseLM)o2;
+                    int ret = p1.score < p2.score ? 1 : (p1.score == p2.score) ? 0 : -1;
+                    return ret;
+                }
+             });
+             
+             for (int i = 0 ; i<p.length;i++){
+                 PhraseLM current_phrase= (PhraseLM)p[i];
+                 out.write("Phrase:"+current_phrase.line + ";Freq:"+ current_phrase.score+"\n");
+             }
+             out.close();
+         }catch(Exception e){System.out.println("exception" +e);}
+         
+         
+         
+     }
      
-     
-     public static void sort_phrases(String outFile){
+    /* public static void sort_phrases(String outFile){
          
          try{
             File output_file = new File(outFile);
@@ -402,7 +534,7 @@ public class match {
          
          
          
-     }
+     }*/
      
      
      // This function just takes the N gram input and finds all S-V-O phrases
@@ -417,29 +549,37 @@ public class match {
           */
          
          // load object List
-         readObjectList("/Users/girish/Dropbox/Tanvi_code/submit/data_files/expanded_object_list.txt");
+         readObjectList("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/expanded_object_list.txt");
          System.out.println(" expanded object list " + expanded_object_list);
          
          //load verb list
-         readVerbList("/Users/girish/Dropbox/Tanvi_code/submit/data_files/all_forms_verb.txt");
+         readVerbList("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/all_forms_verb.txt");
          System.out.println(" expanded verb list " + expanded_verb_list);
          
          // inDir: this is the directory containing new shortened N grams, I will send you this directory containing from unigram till 5 grams files (shortened)
-         String inDir = "/Users/girish/Dropbox/Tanvi_code/prog_output";
+         String inDir = "/home/niveda/Documents/RA_work/Tanvi_code/prog_output";
          //output phrases are stored in this location
-         String outFile = "/Users/girish/Dropbox/Tanvi_code/submit/data_files/person_pass_ball/all_phrases";
+         String outFile = "/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/all_phrases";
          
          // this function finds all (subject-verb) phrases and (verb-object)phrases respectively
          processTriple("person","pass","ball", inDir, outFile);
          
+         System.out.println("Loading Language Model:");
+         sblm = LmReaders.readGoogleLmBinary("/home/niveda/Documents/RA_work/eng.blm","/home/niveda/Documents/RA_work/vocab_cs");
+         System.out.println("Language Model loaded successfully");
+         System.out.println("Merging Phrases based on Langauge Model");
          // This function then merges these two phrases to form a complete subject-verb-object phrases (it takes care of active as well as passive tense)
          // and writes the result to this path
          // count of this final phrase is count of S-V phrase * count of V-O phrase
-         mergeLists("/Users/girish/Dropbox/Tanvi_code/submit/data_files/person_pass_ball/final_phrases.txt");
+        // mergeLists("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/final_phrases.txt");
+         
+         //This function merges two phrases and assigns it a probability score based on a language model
+         mergeLists_LanguageModel("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/final_lm_phrases.txt");
          
          // sorts by these counts in descending order and write it to this final
-         sort_phrases("/Users/girish/Dropbox/Tanvi_code/submit/data_files/person_pass_ball/sort_final_phrases.txt");
-         
+        // sort_phrases("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/sort_final_phrases.txt");
+         sort_phrases_LanguageModel("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/sort_final_lm_phrases.txt");
+        
       
      }
     
