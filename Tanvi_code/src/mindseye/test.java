@@ -11,12 +11,13 @@ import java.io.*;
  *
  * @author tanvi
  */
+import java.awt.*;
 public class test {
     
     
     
     public static void main(String args[]){
-        String pattern = "[\\s]+";
+       /* String pattern = "[\\s]+";
         String colours = "Red White      Blue    Green        Yellow    Orange";
  
         Pattern splitter = Pattern.compile(pattern);
@@ -29,7 +30,9 @@ public class test {
         System.out.println("name " + f.getName());
         
         String current = "ball";
-        if (current.charAt(current.length()-1)=='s') System.out.println("worked");
+        if (current.charAt(current.length()-1)=='s') System.out.println("worked");*/
+    	Toolkit.getDefaultToolkit().beep();    
+//Beep b=new Beep();
     }
     
     

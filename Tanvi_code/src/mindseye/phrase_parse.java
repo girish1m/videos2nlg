@@ -22,22 +22,18 @@ import java.util.regex.Pattern;
  */
 
 
-class PCFGphrase{
-    String line;
-    int frequency;
-    double pcfg_score;
-}
+
 
 public class phrase_parse {
   
     static String parserPath = "/home/niveda/Documents/RA_work/Tanvi_code/submit/dependencies/englishPCFG.ser.gz";
     static ArrayList<PCFGphrase> pcfg_phrases = new ArrayList<PCFGphrase>();
     
-    static ArrayList<String> subject_words = new ArrayList<String>();
-    static ArrayList<String> verb_words = new ArrayList<String>();
-    static ArrayList<String> object_words = new ArrayList<String>();
-    
-    
+    public static ArrayList<String> subject_words = new ArrayList<String>();
+    public static ArrayList<String> verb_words = new ArrayList<String>();
+    public static ArrayList<String> object_words = new ArrayList<String>();
+    public static Object[] p=null;
+     
      public static void readPhrases(String inFile, String outFile){
         
         try{
@@ -128,7 +124,7 @@ public class phrase_parse {
             BufferedWriter out = new BufferedWriter(fstream);
          
              // sortin
-             Object[] p = pcfg_phrases.toArray();
+             p = pcfg_phrases.toArray();
              Arrays.sort(p, new Comparator() {
 
                 @Override

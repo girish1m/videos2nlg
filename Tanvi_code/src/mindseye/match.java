@@ -62,22 +62,23 @@ class PhraseLM{
 public class match {
     
     //object List
-    static HashMap<String, ArrayList<String>> expanded_object_list = new HashMap<String, ArrayList<String>>();
+    public static HashMap<String, ArrayList<String>> expanded_object_list = new HashMap<String, ArrayList<String>>();
     //verb List
-    static HashMap<String, ArrayList<String>> expanded_verb_list = new HashMap<String, ArrayList<String>>();
+    public static HashMap<String, ArrayList<String>> expanded_verb_list = new HashMap<String, ArrayList<String>>();
     
     // subject-verb phrases
     static ArrayList<String> subject_verb = new ArrayList<String>();
     // verb-object phrases
     static HashMap<String, ArrayList<String>> verb_object = new HashMap<String, ArrayList<String>>();
     // object-verb phrases
-    static ArrayList<String> object_verb = new ArrayList<String>();
+//    static ArrayList<String> object_verb = new ArrayList<String>();
     // verb-subject phrases
-    static HashMap<String, ArrayList<String>> verb_subject = new HashMap<String, ArrayList<String>>();
+ //   static HashMap<String, ArrayList<String>> verb_subject = new HashMap<String, ArrayList<String>>();
     
     static ArrayList<Phrase> all_phrases = new ArrayList<Phrase>();
     static ArrayList<PhraseLM> all_phrases_lm = new ArrayList<PhraseLM>();
     static StupidBackoffLm<String> sblm=null;
+    
     
     
     /* public static void readNGrams(String inputDir, ArrayList<Pair> pairs, String outFile){
@@ -168,7 +169,7 @@ public class match {
                         subject_verb.add(line);
                         out_subject_verb.write(line+"\n");
                     }
-                    if ((object_words.contains(first) || object_words.contains(second)) && verb_words.contains(last)){
+                 /*   if ((object_words.contains(first) || object_words.contains(second)) && verb_words.contains(last)){
                         object_verb.add(line);
                         out_object_verb.write(line+"\n");
                     }
@@ -178,7 +179,7 @@ public class match {
                         value.add(line);
                         verb_subject.put(first, value);
                         out_verb_subject.write(line+"\n");
-                    }
+                    }*/
                     if (verb_words.contains(first) && object_words.contains(last)){
                         ArrayList<String> value = verb_object.get(first);
                         if (value == null) value = new ArrayList<String>();
@@ -204,7 +205,7 @@ public class match {
          
      }
      
-    /* public static void mergeLists(String outFile){
+     public static void mergeLists(String outFile){
          
          try{
             File output_file = new File(outFile);
@@ -253,7 +254,7 @@ public class match {
              
                     
              // passive phrases
-             Iterator it_object_verb = object_verb.iterator();
+        /*     Iterator it_object_verb = object_verb.iterator();
              while(it_object_verb.hasNext()){
                  String current = (String)it_object_verb.next();
                  System.out.println("object verb line " + current);
@@ -290,15 +291,15 @@ public class match {
                      out.write("Phrase:"+ newphrase+";Freq:"+finalfreq+"\n");
                  }
 
-             }
+             }*/
              
  
             out.close();
         }catch(Exception e){System.out.println("exception" +e);}
      
-     } */
+     } 
      
- public static void mergeLists_LanguageModel(String outFile){
+ /*public static void mergeLists_LanguageModel(String outFile){
          
          try{
             File output_file = new File(outFile);
@@ -333,7 +334,7 @@ public class match {
               
                      String newphrase = current + " "+ verb_object_phrase;
                      
-                     double finalscore = 0; //Assign a score based on words and words_verb_object
+                     double finalscore= 0; //Assign a score based on words and words_verb_object
                      for(int i=0;i<words.length-4;i++)
                     	 finalscore+=sblm.getLogProb(Arrays.asList(words[i], words[i+1], words[i+2]));
                      finalscore+=sblm.getLogProb(Arrays.asList(words[words.length-3], words[words.length-2],words_verb_object[1]));
@@ -403,7 +404,7 @@ public class match {
         }catch(Exception e){System.out.println("exception" +e);}
     
      }
-
+*/
      
      public static void readObjectList(String objectFile){
         
@@ -430,6 +431,7 @@ public class match {
                         for (int i = 0 ; i<words.length;i++){
                             
                             expanded_words.add(words[i].substring(1));
+                            System.out.println(words[i].substring(1));
                         }
                     }
                     //System.out.println("added " + line);
@@ -505,7 +507,7 @@ public class match {
          
      }
      
-    /* public static void sort_phrases(String outFile){
+     public static void sort_phrases(String outFile){
          
          try{
             File output_file = new File(outFile);
@@ -534,7 +536,7 @@ public class match {
          
          
          
-     }*/
+     }
      
      
      // This function just takes the N gram input and finds all S-V-O phrases
@@ -571,10 +573,10 @@ public class match {
          // This function then merges these two phrases to form a complete subject-verb-object phrases (it takes care of active as well as passive tense)
          // and writes the result to this path
          // count of this final phrase is count of S-V phrase * count of V-O phrase
-        // mergeLists("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/final_phrases.txt");
+         mergeLists("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/final_phrases.txt");
          
          //This function merges two phrases and assigns it a probability score based on a language model
-         mergeLists_LanguageModel("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/final_lm_phrases.txt");
+        // mergeLists_LanguageModel("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/final_lm_phrases.txt");
          
          // sorts by these counts in descending order and write it to this final
         // sort_phrases("/home/niveda/Documents/RA_work/Tanvi_code/submit/data_files/person_pass_ball/sort_final_phrases.txt");
